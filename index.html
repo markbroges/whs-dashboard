@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WHS Dashboard — Mark's Team</title>
+<style>
+  :root {
+    --surface-0: #f6f5f2; --surface-1: #f0efe9; --surface-2: #ffffff;
+    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #898781;
+    --border: rgba(11,11,11,0.10); --accent-bg: #eeedfe; --accent-text: #3c3489;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-voice: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px 24px; background: var(--surface-0); font-family: var(--font-sans); color: var(--text-primary); }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; flex-wrap: wrap; gap: 8px; }
+  .title { font-family: var(--font-voice); font-size: 26px; }
+  .meta { font-size: 13px; color: var(--text-muted); }
+  .subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .kpi { background: var(--surface-1); border-radius: 10px; padding: 16px 18px; }
+  .kpi .label { font-size: 13px; color: var(--text-secondary); }
+  .kpi .value { font-size: 26px; font-weight: 600; margin-top: 6px; }
+  .section { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
+  .section h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  .section .section-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 14px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+  .template-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; gap: 8px; }
+  .template-row:last-child { border-bottom: none; }
+  .template-row .name.untitled { color: var(--text-secondary); font-style: italic; }
+  .template-row .date { color: var(--text-muted); white-space: nowrap; }
+  .callout { background: var(--accent-bg); color: var(--accent-text); border-radius: 10px; padding: 16px 18px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
+  .dd-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .dd-summary { font-size: 13px; color: var(--text-secondary); }
+  .dd-row { display: flex; gap: 14px; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
+  .dd-row:last-child { border-bottom: none; }
+  .dd-num { width: 26px; height: 26px; border-radius: 50%; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dd-body { flex: 1; min-width: 0; }
+  .dd-title-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dd-title { font-size: 14px; font-weight: 600; }
+  .dd-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .dd-detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .dd-evidence { font-size: 13px; margin-top: 6px; }
+  .dd-records { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
+  .disclaimer { font-size: 11px; color: var(--text-muted); line-height: 1.6; border-top: 0.5px solid var(--border); padding-top: 14px; margin-top: 4px; }
+  .body-cols { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .body-diagram { flex-shrink: 0; }
+  .body-side { flex: 1; min-width: 200px; }
+  .body-summary { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.5; }
+  .body-injury-count { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .trend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .trend-label { width: 230px; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
+  .trend-bar { flex: 1; height: 16px; background: var(--surface-1); border-radius: 4px; overflow: hidden; display: flex; }
+  .trend-seg { height: 100%; }
+  .trend-total { width: 26px; text-align: right; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .hoc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .hoc-label { width: 300px; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
+  .hoc-bar-track { flex: 1; height: 14px; background: var(--surface-1); border-radius: 4px; overflow: hidden; }
+  .hoc-bar-fill { height: 100%; }
+  .hoc-count { width: 24px; text-align: right; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .insight { background: var(--surface-1); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 12px; }
+  .ll-row { padding: 12px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+  .ll-row:last-child { border-bottom: none; }
+  .ll-control { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+  .ll-lead, .ll-lag { color: var(--text-secondary); margin-top: 3px; }
+  .ll-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-right: 8px; background: #eaf3de; color: #27500a; }
+  .ll-tag.lag { background: var(--accent-bg); color: var(--accent-text); }
+  .risk-matrix { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .risk-matrix th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .risk-matrix td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; }
+  .risk-matrix td.rm-row-label { text-align: left; font-weight: 400; color: var(--text-secondary); }
+  .footer { font-size: 12px; color: var(--text-muted); margin-top: 24px; text-align: center; }
+  .footer code { background: var(--surface-1); padding: 2px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="title">WHS Dashboard</div>
+    <div class="meta">Mark's Team &middot; SafetyCulture</div>
+  </div>
+  <div class="subtitle">Work Health &amp; Safety activity snapshot &mdash; generated 24 Jul 2026, 11:04 UTC &mdash; reporting structure aligned to SafeWork NSW's "Measuring and Reporting WHS Information" best-practice guide</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Inspections</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Completion rate</div><div class="value">—</div></div>
+    <div class="kpi"><div class="label">Open actions</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Overdue actions</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Active sites</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Templates published</div><div class="value">1</div></div>
+    <div class="kpi"><div class="label">Training courses</div><div class="value">2</div></div>
+    <div class="kpi"><div class="label">Training completion</div><div class="value">0%</div></div>
+    <div class="kpi"><div class="label">Incidents</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Open incidents</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Recordable injuries (12mo)</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">Near misses (12mo)</div><div class="value">0</div></div>
+    <div class="kpi"><div class="label">TRIFR (12mo)</div><div class="value">—</div></div>
+  </div>
+
+  <div class="callout">No inspections run yet. No open actions. Training completion rate: 0% (0/4 assignments).</div>
+
+  <div class="cols">
+    <div class="section">
+      <h3>Published templates</h3>
+      <div class="template-row"><span class="name ">Riot Games: Safety Inspection Checklist</span><span class="date">modified 2026-07-24</span></div>
+
+    </div>
+    <div class="section">
+      <h3>Training courses</h3>
+      <div class="template-row"><span class="name">Safety Training for Gig Drivers</span><span class="date">0/2 completed</span></div>
+<div class="template-row"><span class="name">Chain of Responsibility Training</span><span class="date">0/2 completed</span></div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Injury severity &amp; trend</h3>
+    <p class="section-sub">Classified using the Fatality / Class 1 (high consequence) / Class 2 (temporary impairment) / Class 3 (near miss) taxonomy — SafeWork NSW's guide argues this gives a truer picture of harm than LTI/LTIFR alone. TRIFR = (Recordable Injuries ÷ hours worked) × 1,000,000 over the rolling 12 months. SafetyCulture doesn't track hours worked — set the WHS_HOURS_WORKED_12MO environment variable (from payroll/roster data) when regenerating this dashboard to calculate a live figure.</p>
+    
+        <div class="trend-row">
+          <div class="trend-label">Previous 12 months</div>
+          <div class="trend-bar"></div>
+          <div class="trend-total">0</div>
+        </div>
+        <div class="trend-row">
+          <div class="trend-label">Rolling 12 months</div>
+          <div class="trend-bar"></div>
+          <div class="trend-total">0</div>
+        </div>
+        <div class="trend-row">
+          <div class="trend-label">Jul 2026 — recordable injuries</div>
+          <div class="trend-bar"></div>
+          <div class="trend-total">0</div>
+        </div>
+        <div class="trend-row">
+          <div class="trend-label">Jul 2026 — near misses</div>
+          <div class="trend-bar"></div>
+          <div class="trend-total">0</div>
+        </div>
+    <div class="legend">
+      <span><i style="background:#3d0a0a;"></i>Fatality</span>
+      <span><i style="background:#2f6fed;"></i>Class 1</span>
+      <span><i style="background:#9b3fd4;"></i>Class 2</span>
+      <span><i style="background:#d4a72c;"></i>Class 3 / near miss</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Incidents &amp; injuries</h3>
+    <p class="section-sub">0 incident(s) recorded, 0 still open. Body-region breakdown reflects any incident question whose text indicates a body-part/injury-location field (0 answer(s) matched), colour-coded by the most severe class recorded for that region.</p>
+    <div class="body-cols">
+      <div class="body-diagram">
+        
+    <svg viewBox="0 0 300 345" width="260" height="299" role="img" aria-label="Body diagram showing injury counts by body region, colour-coded by severity class">
+      <circle cx="150" cy="35" r="26" fill="#e8e6df"/><rect x="138" y="60" width="24" height="16" fill="#e8e6df"/><rect x="112" y="80" width="76" height="48" rx="8" fill="#e8e6df"/><rect x="116" y="128" width="68" height="42" rx="8" fill="#e8e6df"/><rect x="114" y="170" width="72" height="28" rx="10" fill="#e8e6df"/><circle cx="100" cy="85" r="14" fill="#e8e6df"/><circle cx="200" cy="85" r="14" fill="#e8e6df"/><rect x="68" y="82" width="26" height="100" rx="12" fill="#e8e6df"/><rect x="206" y="82" width="26" height="100" rx="12" fill="#e8e6df"/><circle cx="81" cy="196" r="15" fill="#e8e6df"/><circle cx="219" cy="196" r="15" fill="#e8e6df"/><rect x="120" y="198" width="30" height="95" rx="12" fill="#e8e6df"/><rect x="150" y="198" width="30" height="95" rx="12" fill="#e8e6df"/><circle cx="135" cy="258" r="14" fill="#e8e6df"/><circle cx="165" cy="258" r="14" fill="#e8e6df"/><ellipse cx="135" cy="320" rx="20" ry="11" fill="#e8e6df"/><ellipse cx="165" cy="320" rx="20" ry="11" fill="#e8e6df"/>
+      <rect x="248" y="110" width="44" height="80" rx="6" fill="#e8e6df" stroke="#c3c2b7" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="270" y="205" font-size="10" text-anchor="middle" fill="var(--text-muted, #898781)">Back</text>
+      
+    </svg>
+    
+        <div class="legend">
+          <span><i style="background:#e8e6df;"></i>No data</span>
+          <span><i style="background:#d4a72c;"></i>Class 3 / near miss</span>
+          <span><i style="background:#9b3fd4;"></i>Class 2</span>
+          <span><i style="background:#2f6fed;"></i>Class 1</span>
+          <span><i style="background:#3d0a0a;"></i>Fatality</span>
+        </div>
+      </div>
+      <div class="body-side">
+        <div class="body-summary">No body-part field detected on recorded incidents yet.</div>
+        <div class="body-injury-count">Recordable injuries: 0 month-to-date &middot; 0 year-to-date</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Incidents by category</div>
+        <div class="template-row"><span class="name untitled">No incidents recorded yet</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Hierarchy of control — completed corrective actions</h3>
+    <p class="section-sub">0 completed action(s) classified by inferred control level, from title/description text.</p>
+    
+        <div class="hoc-row">
+          <div class="hoc-label">Eliminated hazard</div>
+          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#27500a;"></div></div>
+          <div class="hoc-count">0</div>
+        </div>
+        <div class="hoc-row">
+          <div class="hoc-label">Minimised — engineering / substitution / isolation</div>
+          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#2f6fed;"></div></div>
+          <div class="hoc-count">0</div>
+        </div>
+        <div class="hoc-row">
+          <div class="hoc-label">Administrative controls / training / PPE</div>
+          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#d4a72c;"></div></div>
+          <div class="hoc-count">0</div>
+        </div>
+        <div class="hoc-row">
+          <div class="hoc-label">Not classified from action text</div>
+          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#c3c2b7;"></div></div>
+          <div class="hoc-count">0</div>
+        </div>
+    <div class="insight">No completed corrective actions yet — this breakdown will populate as actions are closed out.</div>
+  </div>
+
+  <div class="section">
+    <h3>Lead &amp; lag indicators — key WHS controls</h3>
+    <p class="section-sub">Lead = effort/resourcing put into a control. Lag = evidence the control is actually working. Framework per SafeWork NSW's inputs&nbsp;&rarr;&nbsp;outputs&nbsp;&rarr;&nbsp;outcomes model; figures below are live account data.</p>
+    
+        <div class="ll-row">
+          <div class="ll-control">Inspections & hazard checklists</div>
+          <div class="ll-lead"><span class="ll-tag">Lead</span>0 inspection(s) completed against 1 published template(s)</div>
+          <div class="ll-lag"><span class="ll-tag lag">Lag</span>— completion rate</div>
+        </div>
+        <div class="ll-row">
+          <div class="ll-control">Corrective actions</div>
+          <div class="ll-lead"><span class="ll-tag">Lead</span>0 action(s) raised</div>
+          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0 of 0 open action(s) overdue</div>
+        </div>
+        <div class="ll-row">
+          <div class="ll-control">WHS training</div>
+          <div class="ll-lead"><span class="ll-tag">Lead</span>4 assignment(s) issued across 2 published course(s)</div>
+          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0% completion rate</div>
+        </div>
+        <div class="ll-row">
+          <div class="ll-control">Incident reporting & investigation</div>
+          <div class="ll-lead"><span class="ll-tag">Lead</span>0 incident(s) logged</div>
+          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0 of 0 still open</div>
+        </div>
+  </div>
+
+  <div class="section">
+    <h3>WHS risk matrix — reference tool</h3>
+    <p class="section-sub">Rates risk by quality of existing controls &times; consequence class, rather than a subjective likelihood &times; consequence estimate — the approach SafeWork NSW's guide recommends. This is a decision aid for assessing hazards, not live account data.</p>
+    <table class="risk-matrix"><thead><tr><th>Quality of existing controls</th><th>Class 2<br/>(temporary impairment)</th><th>Class 1<br/>(high consequence)</th><th>Catastrophic<br/>(multiple fatality)</th></tr></thead><tbody><tr><td class="rm-row-label"><strong>1.</strong> Hazard eliminated — no identifiable residual risk</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td></tr><tr><td class="rm-row-label"><strong>2.</strong> Controls in place to the full extent reasonably practicable</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td></tr><tr><td class="rm-row-label"><strong>3.</strong> Existing controls appear adequate, but stronger controls are available</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td></tr><tr><td class="rm-row-label"><strong>4.</strong> Existing controls are inadequate</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td></tr><tr><td class="rm-row-label"><strong>5.</strong> Risk is effectively uncontrolled</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td></tr></tbody></table>
+  </div>
+
+  <div class="section">
+    <div class="dd-header">
+      <h3 style="margin-bottom:0;">Director / Officer Due Diligence — WHS Act s27</h3>
+      <span class="dd-summary">0/6 elements with evidence</span>
+    </div>
+    <p class="section-sub">Mapped to the six elements of the officer due-diligence duty under s27(5) of the (Australian) Work Health and Safety Act 2011, per Safe Work Australia / SafeWork NSW guidance.</p>
+    
+    <div class="dd-row">
+      <div class="dd-num">1</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Up-to-date WHS knowledge</span>
+          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+        </div>
+        <div class="dd-detail">Officer/governance training records, briefings on WHS law and regulator priorities.</div>
+        <div class="dd-evidence">2 course(s) published, but no recorded completions yet.</div>
+        <div class="dd-records">Typical records: officer training records, board skills matrix, briefing packs</div>
+      </div>
+    </div>
+    <div class="dd-row">
+      <div class="dd-num">2</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Understand operations, hazards & risks</span>
+          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+        </div>
+        <div class="dd-detail">Site coverage, hazard/risk checklists, critical-risk visibility.</div>
+        <div class="dd-evidence">1 template(s) published, but no sites/locations recorded to scope operations.</div>
+        <div class="dd-records">Typical records: risk registers, site visit logs, published templates</div>
+      </div>
+    </div>
+    <div class="dd-row">
+      <div class="dd-num">3</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Resources & processes to control risk</span>
+          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+        </div>
+        <div class="dd-detail">Inspections actually run against hazard checklists; controls in use, not just on paper.</div>
+        <div class="dd-evidence">Templates exist but no inspections have been run against them yet.</div>
+        <div class="dd-records">Typical records: capital/resourcing requests, staffing plans, inspection frequency</div>
+      </div>
+    </div>
+    <div class="dd-row">
+      <div class="dd-num">4</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Timely response to hazards & incidents</span>
+          <span class="dd-badge" style="background:#fcebeb;color:#791f1f;">Gap</span>
+        </div>
+        <div class="dd-detail">Actions raised, assigned, and closed out within a reasonable time.</div>
+        <div class="dd-evidence">No corrective actions or incident reports recorded — no evidence of a hazard-response workflow in use.</div>
+        <div class="dd-records">Typical records: incident trend dashboards, action closure reports</div>
+      </div>
+    </div>
+    <div class="dd-row">
+      <div class="dd-num">5</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Processes to comply with WHS duties</span>
+          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+        </div>
+        <div class="dd-detail">Notifiable incident reporting, consultation, WHS training/instruction, HSR training entitlements.</div>
+        <div class="dd-evidence">Only one of training or inspections is in active use.</div>
+        <div class="dd-records">Typical records: training matrices, consultation records, procedure suite</div>
+      </div>
+    </div>
+    <div class="dd-row">
+      <div class="dd-num">6</div>
+      <div class="dd-body">
+        <div class="dd-title-row">
+          <span class="dd-title">Verify resources & processes are used</span>
+          <span class="dd-badge" style="background:#fcebeb;color:#791f1f;">Gap</span>
+        </div>
+        <div class="dd-detail">Audits, inspections, reviews confirming controls are actually applied, not just documented.</div>
+        <div class="dd-evidence">No inspections completed and no training completions recorded — nothing yet to verify.</div>
+        <div class="dd-records">Typical records: audit plans/reports, corrective action logs, decision register</div>
+      </div>
+    </div>
+    <div class="disclaimer">
+      This panel surfaces evidence already present in your SafetyCulture account against the six statutory
+      elements of officer due diligence &mdash; it is a compliance-evidence aid, not a legal assessment.
+      "Evidence found" reflects data present, not a determination that due diligence has been satisfied;
+      "reasonable steps" is assessed by courts and regulators against your specific role, operations, and risk
+      profile. This is not legal advice. Seek independent legal advice on how these duties apply to your
+      circumstances. Source: SafeWork NSW, "Due diligence" and "The work health and safety duty of an officer"
+      guidance (safework.nsw.gov.au), interpreting s27 of the WHS Act 2011.
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by <code>generate_dashboard.py</code> via the SafetyCulture MCP integration.
+    To refresh: <code>python3 generate_dashboard.py</code> (requires <code>SAFETYCULTURE_API_TOKEN</code>;
+    optionally <code>WHS_HOURS_WORKED_12MO</code> for a live TRIFR).
+    Reporting structure informed by SafeWork NSW, "Measuring and Reporting WHS Information" (2020).
+  </div>
+</div>
+</body>
+</html>
