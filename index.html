@@ -15,10 +15,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; padding: 40px 24px; background: var(--surface-0); font-family: var(--font-sans); color: var(--text-primary); }
   .wrap { max-width: 880px; margin: 0 auto; }
-  .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; flex-wrap: wrap; gap: 8px; }
-  .title { font-family: var(--font-voice); font-size: 26px; }
-  .meta { font-size: 13px; color: var(--text-muted); }
-  .subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+  .meta-top { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
   .kpi { background: var(--surface-1); border-radius: 10px; padding: 16px 18px; }
   .kpi .label { font-size: 13px; color: var(--text-secondary); }
@@ -75,21 +72,16 @@
   .risk-matrix th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); }
   .risk-matrix td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; }
   .risk-matrix td.rm-row-label { text-align: left; font-weight: 400; color: var(--text-secondary); }
-  .footer { font-size: 12px; color: var(--text-muted); margin-top: 24px; text-align: center; }
-  .footer code { background: var(--surface-1); padding: 2px 6px; border-radius: 4px; }
+  .footer { font-size: 10px; color: var(--text-muted); margin-top: 14px; text-align: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="header">
-    <div class="title">WHS Dashboard</div>
-    <div class="meta">Mark's Team &middot; SafetyCulture</div>
-  </div>
-  <div class="subtitle">Work Health &amp; Safety activity snapshot &mdash; generated 24 Jul 2026, 11:04 UTC &mdash; reporting structure aligned to SafeWork NSW's "Measuring and Reporting WHS Information" best-practice guide</div>
+  <div class="meta-top">Generated 27 Jul 2026, 03:08 UTC</div>
 
   <div class="kpis">
-    <div class="kpi"><div class="label">Inspections</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Completion rate</div><div class="value">—</div></div>
+    <div class="kpi"><div class="label">Inspections</div><div class="value">1</div></div>
+    <div class="kpi"><div class="label">Completion rate</div><div class="value">100%</div></div>
     <div class="kpi"><div class="label">Open actions</div><div class="value">0</div></div>
     <div class="kpi"><div class="label">Overdue actions</div><div class="value">0</div></div>
     <div class="kpi"><div class="label">Active sites</div><div class="value">0</div></div>
@@ -103,7 +95,7 @@
     <div class="kpi"><div class="label">TRIFR (12mo)</div><div class="value">—</div></div>
   </div>
 
-  <div class="callout">No inspections run yet. No open actions. Training completion rate: 0% (0/4 assignments).</div>
+  <div class="callout">100% of 1 inspections completed. No open actions. Training completion rate: 0% (0/4 assignments).</div>
 
   <div class="cols">
     <div class="section">
@@ -214,8 +206,8 @@
     
         <div class="ll-row">
           <div class="ll-control">Inspections & hazard checklists</div>
-          <div class="ll-lead"><span class="ll-tag">Lead</span>0 inspection(s) completed against 1 published template(s)</div>
-          <div class="ll-lag"><span class="ll-tag lag">Lag</span>— completion rate</div>
+          <div class="ll-lead"><span class="ll-tag">Lead</span>1 inspection(s) completed against 1 published template(s)</div>
+          <div class="ll-lag"><span class="ll-tag lag">Lag</span>100% completion rate</div>
         </div>
         <div class="ll-row">
           <div class="ll-control">Corrective actions</div>
@@ -243,7 +235,7 @@
   <div class="section">
     <div class="dd-header">
       <h3 style="margin-bottom:0;">Director / Officer Due Diligence — WHS Act s27</h3>
-      <span class="dd-summary">0/6 elements with evidence</span>
+      <span class="dd-summary">2/6 elements with evidence</span>
     </div>
     <p class="section-sub">Mapped to the six elements of the officer due-diligence duty under s27(5) of the (Australian) Work Health and Safety Act 2011, per Safe Work Australia / SafeWork NSW guidance.</p>
     
@@ -276,10 +268,10 @@
       <div class="dd-body">
         <div class="dd-title-row">
           <span class="dd-title">Resources & processes to control risk</span>
-          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+          <span class="dd-badge" style="background:#eaf3de;color:#27500a;">Evidence found</span>
         </div>
         <div class="dd-detail">Inspections actually run against hazard checklists; controls in use, not just on paper.</div>
-        <div class="dd-evidence">Templates exist but no inspections have been run against them yet.</div>
+        <div class="dd-evidence">1 inspection(s) run using published templates.</div>
         <div class="dd-records">Typical records: capital/resourcing requests, staffing plans, inspection frequency</div>
       </div>
     </div>
@@ -300,10 +292,10 @@
       <div class="dd-body">
         <div class="dd-title-row">
           <span class="dd-title">Processes to comply with WHS duties</span>
-          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
+          <span class="dd-badge" style="background:#eaf3de;color:#27500a;">Evidence found</span>
         </div>
         <div class="dd-detail">Notifiable incident reporting, consultation, WHS training/instruction, HSR training entitlements.</div>
-        <div class="dd-evidence">Only one of training or inspections is in active use.</div>
+        <div class="dd-evidence">Both training courses and inspection processes are active.</div>
         <div class="dd-records">Typical records: training matrices, consultation records, procedure suite</div>
       </div>
     </div>
@@ -312,10 +304,10 @@
       <div class="dd-body">
         <div class="dd-title-row">
           <span class="dd-title">Verify resources & processes are used</span>
-          <span class="dd-badge" style="background:#fcebeb;color:#791f1f;">Gap</span>
+          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
         </div>
         <div class="dd-detail">Audits, inspections, reviews confirming controls are actually applied, not just documented.</div>
-        <div class="dd-evidence">No inspections completed and no training completions recorded — nothing yet to verify.</div>
+        <div class="dd-evidence">Inspection completion 100%, training completion 0% — below a healthy threshold.</div>
         <div class="dd-records">Typical records: audit plans/reports, corrective action logs, decision register</div>
       </div>
     </div>
@@ -330,12 +322,7 @@
     </div>
   </div>
 
-  <div class="footer">
-    Generated by <code>generate_dashboard.py</code> via the SafetyCulture MCP integration.
-    To refresh: <code>python3 generate_dashboard.py</code> (requires <code>SAFETYCULTURE_API_TOKEN</code>;
-    optionally <code>WHS_HOURS_WORKED_12MO</code> for a live TRIFR).
-    Reporting structure informed by SafeWork NSW, "Measuring and Reporting WHS Information" (2020).
-  </div>
+  <div class="footer">SafeWork NSW, "Measuring and Reporting WHS Information" (2020)</div>
 </div>
 </body>
 </html>
