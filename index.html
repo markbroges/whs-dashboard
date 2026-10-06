@@ -1,329 +1,483 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-AU">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex, nofollow, noarchive" />
-<title>WHS Dashboard — Mark's Team</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<title>Harbourline WHS Board Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-  :root {
-    --surface-0: #f6f5f2; --surface-1: #f0efe9; --surface-2: #ffffff;
-    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #898781;
-    --border: rgba(11,11,11,0.10); --accent-bg: #eeedfe; --accent-text: #3c3489;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    --font-voice: Georgia, "Times New Roman", serif;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 40px 24px; background: var(--surface-0); font-family: var(--font-sans); color: var(--text-primary); }
-  .wrap { max-width: 880px; margin: 0 auto; }
-  .meta-top { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
-  .kpi { background: var(--surface-1); border-radius: 10px; padding: 16px 18px; }
-  .kpi .label { font-size: 13px; color: var(--text-secondary); }
-  .kpi .value { font-size: 26px; font-weight: 600; margin-top: 6px; }
-  .section { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
-  .section h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
-  .section .section-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 14px; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
-  .template-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; gap: 8px; }
-  .template-row:last-child { border-bottom: none; }
-  .template-row .name.untitled { color: var(--text-secondary); font-style: italic; }
-  .template-row .date { color: var(--text-muted); white-space: nowrap; }
-  .callout { background: var(--accent-bg); color: var(--accent-text); border-radius: 10px; padding: 16px 18px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
-  .dd-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-  .dd-summary { font-size: 13px; color: var(--text-secondary); }
-  .dd-row { display: flex; gap: 14px; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
-  .dd-row:last-child { border-bottom: none; }
-  .dd-num { width: 26px; height: 26px; border-radius: 50%; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .dd-body { flex: 1; min-width: 0; }
-  .dd-title-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .dd-title { font-size: 14px; font-weight: 600; }
-  .dd-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-  .dd-detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-  .dd-evidence { font-size: 13px; margin-top: 6px; }
-  .dd-records { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
-  .disclaimer { font-size: 11px; color: var(--text-muted); line-height: 1.6; border-top: 0.5px solid var(--border); padding-top: 14px; margin-top: 4px; }
-  .body-cols { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-  .body-diagram { flex-shrink: 0; }
-  .body-side { flex: 1; min-width: 200px; }
-  .body-summary { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.5; }
-  .body-injury-count { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
-  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted); margin-top: 10px; }
-  .legend span { display: inline-flex; align-items: center; gap: 4px; }
-  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-  .trend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .trend-label { width: 230px; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
-  .trend-bar { flex: 1; height: 16px; background: var(--surface-1); border-radius: 4px; overflow: hidden; display: flex; }
-  .trend-seg { height: 100%; }
-  .trend-total { width: 26px; text-align: right; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-  .hoc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .hoc-label { width: 300px; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
-  .hoc-bar-track { flex: 1; height: 14px; background: var(--surface-1); border-radius: 4px; overflow: hidden; }
-  .hoc-bar-fill { height: 100%; }
-  .hoc-count { width: 24px; text-align: right; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-  .insight { background: var(--surface-1); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 12px; }
-  .ll-row { padding: 12px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
-  .ll-row:last-child { border-bottom: none; }
-  .ll-control { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
-  .ll-lead, .ll-lag { color: var(--text-secondary); margin-top: 3px; }
-  .ll-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-right: 8px; background: #eaf3de; color: #27500a; }
-  .ll-tag.lag { background: var(--accent-bg); color: var(--accent-text); }
-  .risk-matrix { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-  .risk-matrix th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); }
-  .risk-matrix td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; }
-  .risk-matrix td.rm-row-label { text-align: left; font-weight: 400; color: var(--text-secondary); }
-  .footer { font-size: 10px; color: var(--text-muted); margin-top: 14px; text-align: center; }
+/* Layout: control-room board pack. Summary first (board brief + six indicators), then lag → lead → risk → people, one scan top to bottom. */
+:root{
+  --bg:#f3f4f2; --surface:#fcfcfb; --sunken:#eceeeb;
+  --ink:#121513; --ink-2:#4b514d; --muted:#7d847f;
+  --grid:#e1e3df; --axis:#c2c7c2; --border:rgba(18,21,19,.10);
+  --accent:#1d5a8c; --accent-soft:#dce8f2;
+  --s1:#2a78d6; --s2:#eb6834;
+  --q1:#86b6ef; --q2:#2a78d6; --q3:#104281;
+  --good:#0ca30c; --good-ink:#006300; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b; --crit-ink:#b42828;
+  --h0:#f0f2ef; --h1:#cde2fb; --h2:#9ec5f4; --h3:#5598e7; --h4:#256abf; --h5:#104281;
+  --tip-bg:#121513; --tip-ink:#ffffff;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1110; --surface:#181a19; --sunken:#202321;
+  --ink:#f4f5f3; --ink-2:#c3c7c2; --muted:#8b918c;
+  --grid:#2a2d2b; --axis:#3a3e3b; --border:rgba(255,255,255,.10);
+  --accent:#6fa8dc; --accent-soft:#1d2c3a;
+  --s1:#3987e5; --s2:#d95926;
+  --q1:#184f95; --q2:#3987e5; --q3:#9ec5f4;
+  --good-ink:#0ca30c; --crit-ink:#e66767;
+  --h0:#242725; --h1:#16365c; --h2:#1c5cab; --h3:#3987e5; --h4:#6da7ec; --h5:#b7d3f6;
+  --tip-bg:#f4f5f3; --tip-ink:#121513;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1110; --surface:#181a19; --sunken:#202321;
+  --ink:#f4f5f3; --ink-2:#c3c7c2; --muted:#8b918c;
+  --grid:#2a2d2b; --axis:#3a3e3b; --border:rgba(255,255,255,.10);
+  --accent:#6fa8dc; --accent-soft:#1d2c3a;
+  --s1:#3987e5; --s2:#d95926;
+  --q1:#184f95; --q2:#3987e5; --q3:#9ec5f4;
+  --good-ink:#0ca30c; --crit-ink:#e66767;
+  --h0:#242725; --h1:#16365c; --h2:#1c5cab; --h3:#3987e5; --h4:#6da7ec; --h5:#b7d3f6;
+  --tip-bg:#f4f5f3; --tip-ink:#121513;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.top h1{font-size:clamp(24px,3.2vw,34px);font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.top .meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px;color:var(--ink-2)}
+.sample{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border:1px dashed var(--muted);border-radius:4px;color:var(--ink-2)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls label{font-size:12px;color:var(--ink-2)}
+select{font:inherit;font-size:14px;padding:7px 30px 7px 10px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.panel-h{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;justify-content:space-between}
+.panel-h h2{font-size:16px;font-weight:700}
+.panel-h p{margin:0;color:var(--muted);font-size:12px}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--sunken);color:var(--ink-2)}
+.tag.lag{background:var(--sunken)}
+.tag.lead{background:var(--accent-soft);color:var(--accent)}
+
+/* Brief + tiles */
+.brief{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:980px){.brief{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}}
+.board ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.board li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
+.board li p{margin:0;max-width:62ch}
+.board li b{font-weight:600}
+.decision{margin-top:4px;padding:10px 12px;background:var(--sunken);border-radius:6px;font-size:13px}
+.decision b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:2px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+@media (min-width:640px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tile{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile .label{font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px}
+.tile .value{font-family:var(--f-display);font-size:30px;font-weight:700;line-height:1;letter-spacing:-.01em}
+.tile .value small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
+.tile .foot{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12px;color:var(--muted)}
+.delta{font-weight:600;font-variant-numeric:tabular-nums}
+.delta.good{color:var(--good-ink)} .delta.bad{color:var(--crit-ink)}
+.spark{display:block;width:100%;height:28px}
+
+/* Status pill */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:2px 8px 2px 6px;border-radius:999px;white-space:nowrap;background:var(--sunken);color:var(--ink)}
+.pill i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.pill.good i{background:var(--good)} .pill.warn i{background:var(--warn)} .pill.serious i{background:var(--serious)} .pill.crit i{background:var(--crit)}
+.pill svg{width:12px;height:12px;flex:none}
+
+/* Grids */
+.row{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:900px){.row.r-82{grid-template-columns:minmax(0,8fr) minmax(0,5fr)}.row.r-11{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row.r-75{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}}
+.chart{position:relative;width:100%;min-width:0}
+.chart svg{display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.sw.line{height:2px;width:16px;border-radius:1px}
+.sw.dash{height:0;width:16px;border-top:2px dashed var(--muted);border-radius:0}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto;margin-inline:-4px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px}
+th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left;padding:8px;border-bottom:1px solid var(--axis);white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--grid);vertical-align:middle}
+td.r,th.r{text-align:right}
+tr:last-child td{border-bottom:none}
+.tbl-wrap #t-ccv{min-width:760px}
+.bar-mini{height:6px;background:var(--sunken);border-radius:3px;overflow:hidden;min-width:70px}
+.bar-mini span{display:block;height:100%;background:var(--s1);border-radius:3px}
+.sub{color:var(--muted);font-size:12px}
+
+/* Heatmap */
+.heat{display:grid;gap:3px;font-size:12px;min-width:520px}
+.heat .hc{height:36px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;font-weight:500;cursor:default}
+.heat .hl{display:flex;align-items:center;color:var(--ink-2);padding-right:6px;line-height:1.2}
+.heat .hh{font-size:11px;color:var(--muted);text-align:center;line-height:1.2;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px}
+.dim{opacity:.28;transition:opacity .2s}
+
+/* Actions list */
+.acts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.acts li{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--grid)}
+.acts li:last-child{border-bottom:none}
+.acts .stripe{border-radius:2px}
+.acts .t{font-weight:500}
+.acts .m{font-size:12px;color:var(--muted)}
+.acts .age{font-family:var(--f-mono);font-size:12px;text-align:right;white-space:nowrap}
+
+/* Tooltip */
+.tip{position:fixed;z-index:20;pointer-events:none;background:var(--tip-bg);color:var(--tip-ink);font-size:12px;padding:7px 9px;border-radius:6px;max-width:240px;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip b{font-weight:600}
+.tip .tr{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+
+footer{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;color:var(--muted);font-size:12px;border-top:1px solid var(--axis);padding-top:14px}
+@media (min-width:760px){footer{grid-template-columns:repeat(3,minmax(0,1fr))}}
+footer p{margin:0;max-width:60ch}
+footer b{color:var(--ink-2);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+
+
 <div class="wrap">
-  <div class="meta-top">Generated 27 Jul 2026, 03:50 UTC</div>
-
-  <div class="kpis">
-    <div class="kpi"><div class="label">Inspections</div><div class="value">1</div></div>
-    <div class="kpi"><div class="label">Completion rate</div><div class="value">100%</div></div>
-    <div class="kpi"><div class="label">Open actions</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Overdue actions</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Active sites</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Templates published</div><div class="value">1</div></div>
-    <div class="kpi"><div class="label">Training courses</div><div class="value">2</div></div>
-    <div class="kpi"><div class="label">Training completion</div><div class="value">0%</div></div>
-    <div class="kpi"><div class="label">Incidents</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Open incidents</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Recordable injuries (12mo)</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">Near misses (12mo)</div><div class="value">0</div></div>
-    <div class="kpi"><div class="label">TRIFR (12mo)</div><div class="value">—</div></div>
-  </div>
-
-  <div class="callout">100% of 1 inspections completed. No open actions. Training completion rate: 0% (0/4 assignments).</div>
-
-  <div class="cols">
-    <div class="section">
-      <h3>Published templates</h3>
-      <div class="template-row"><span class="name ">Riot Games: Safety Inspection Checklist</span><span class="date">modified 2026-07-24</span></div>
-
-    </div>
-    <div class="section">
-      <h3>Training courses</h3>
-      <div class="template-row"><span class="name">Safety Training for Gig Drivers</span><span class="date">0/2 completed</span></div>
-<div class="template-row"><span class="name">Chain of Responsibility Training</span><span class="date">0/2 completed</span></div>
-
-    </div>
-  </div>
-
-  <div class="section">
-    <h3>Injury severity &amp; trend</h3>
-    <p class="section-sub">Classified using the Fatality / Class 1 (high consequence) / Class 2 (temporary impairment) / Class 3 (near miss) taxonomy — SafeWork NSW's guide argues this gives a truer picture of harm than LTI/LTIFR alone. TRIFR = (Recordable Injuries ÷ hours worked) × 1,000,000 over the rolling 12 months. SafetyCulture doesn't track hours worked — set the WHS_HOURS_WORKED_12MO environment variable (from payroll/roster data) when regenerating this dashboard to calculate a live figure.</p>
-    
-        <div class="trend-row">
-          <div class="trend-label">Previous 12 months</div>
-          <div class="trend-bar"></div>
-          <div class="trend-total">0</div>
-        </div>
-        <div class="trend-row">
-          <div class="trend-label">Rolling 12 months</div>
-          <div class="trend-bar"></div>
-          <div class="trend-total">0</div>
-        </div>
-        <div class="trend-row">
-          <div class="trend-label">Jul 2026 — recordable injuries</div>
-          <div class="trend-bar"></div>
-          <div class="trend-total">0</div>
-        </div>
-        <div class="trend-row">
-          <div class="trend-label">Jul 2026 — near misses</div>
-          <div class="trend-bar"></div>
-          <div class="trend-total">0</div>
-        </div>
-    <div class="legend">
-      <span><i style="background:#3d0a0a;"></i>Fatality</span>
-      <span><i style="background:#2f6fed;"></i>Class 1</span>
-      <span><i style="background:#9b3fd4;"></i>Class 2</span>
-      <span><i style="background:#d4a72c;"></i>Class 3 / near miss</span>
-    </div>
-  </div>
-
-  <div class="section">
-    <h3>Incidents &amp; injuries</h3>
-    <p class="section-sub">0 incident(s) recorded, 0 still open. Body-region breakdown reflects any incident question whose text indicates a body-part/injury-location field (0 answer(s) matched), colour-coded by the most severe class recorded for that region.</p>
-    <div class="body-cols">
-      <div class="body-diagram">
-        
-    <svg viewBox="0 0 300 345" width="260" height="299" role="img" aria-label="Body diagram showing injury counts by body region, colour-coded by severity class">
-      <circle cx="150" cy="35" r="26" fill="#e8e6df"/><rect x="138" y="60" width="24" height="16" fill="#e8e6df"/><rect x="112" y="80" width="76" height="48" rx="8" fill="#e8e6df"/><rect x="116" y="128" width="68" height="42" rx="8" fill="#e8e6df"/><rect x="114" y="170" width="72" height="28" rx="10" fill="#e8e6df"/><circle cx="100" cy="85" r="14" fill="#e8e6df"/><circle cx="200" cy="85" r="14" fill="#e8e6df"/><rect x="68" y="82" width="26" height="100" rx="12" fill="#e8e6df"/><rect x="206" y="82" width="26" height="100" rx="12" fill="#e8e6df"/><circle cx="81" cy="196" r="15" fill="#e8e6df"/><circle cx="219" cy="196" r="15" fill="#e8e6df"/><rect x="120" y="198" width="30" height="95" rx="12" fill="#e8e6df"/><rect x="150" y="198" width="30" height="95" rx="12" fill="#e8e6df"/><circle cx="135" cy="258" r="14" fill="#e8e6df"/><circle cx="165" cy="258" r="14" fill="#e8e6df"/><ellipse cx="135" cy="320" rx="20" ry="11" fill="#e8e6df"/><ellipse cx="165" cy="320" rx="20" ry="11" fill="#e8e6df"/>
-      <rect x="248" y="110" width="44" height="80" rx="6" fill="#e8e6df" stroke="#c3c2b7" stroke-width="1" stroke-dasharray="3,3"/>
-      <text x="270" y="205" font-size="10" text-anchor="middle" fill="var(--text-muted, #898781)">Back</text>
-      
-    </svg>
-    
-        <div class="legend">
-          <span><i style="background:#e8e6df;"></i>No data</span>
-          <span><i style="background:#d4a72c;"></i>Class 3 / near miss</span>
-          <span><i style="background:#9b3fd4;"></i>Class 2</span>
-          <span><i style="background:#2f6fed;"></i>Class 1</span>
-          <span><i style="background:#3d0a0a;"></i>Fatality</span>
-        </div>
-      </div>
-      <div class="body-side">
-        <div class="body-summary">No body-part field detected on recorded incidents yet.</div>
-        <div class="body-injury-count">Recordable injuries: 0 month-to-date &middot; 0 year-to-date</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Incidents by category</div>
-        <div class="template-row"><span class="name untitled">No incidents recorded yet</span></div>
+  <header class="top">
+    <div>
+      <div class="eyebrow">WHS performance · Board &amp; Audit Committee pack</div>
+      <h1>Harbourline Group</h1>
+      <div class="meta">
+        <span>Reporting period: <b>September 2026</b> · rolling 12 months to 30 Sep 2026</span>
+        <span class="sample" title="All figures are fictional and generated for demonstration">Sample data · illustrative only</span>
       </div>
     </div>
-  </div>
+    <div class="controls">
+      <label for="site">Site</label>
+      <select id="site"></select>
+    </div>
+  </header>
 
-  <div class="section">
-    <h3>Hierarchy of control — completed corrective actions</h3>
-    <p class="section-sub">0 completed action(s) classified by inferred control level, from title/description text.</p>
-    
-        <div class="hoc-row">
-          <div class="hoc-label">Eliminated hazard</div>
-          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#27500a;"></div></div>
-          <div class="hoc-count">0</div>
-        </div>
-        <div class="hoc-row">
-          <div class="hoc-label">Minimised — engineering / substitution / isolation</div>
-          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#2f6fed;"></div></div>
-          <div class="hoc-count">0</div>
-        </div>
-        <div class="hoc-row">
-          <div class="hoc-label">Administrative controls / training / PPE</div>
-          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#d4a72c;"></div></div>
-          <div class="hoc-count">0</div>
-        </div>
-        <div class="hoc-row">
-          <div class="hoc-label">Not classified from action text</div>
-          <div class="hoc-bar-track"><div class="hoc-bar-fill" style="width:0%;background:#c3c2b7;"></div></div>
-          <div class="hoc-count">0</div>
-        </div>
-    <div class="insight">No completed corrective actions yet — this breakdown will populate as actions are closed out.</div>
-  </div>
+  <section class="brief">
+    <div class="panel board">
+      <div class="panel-h"><h2>What the board needs to know</h2><span class="tag">Officer due diligence · WHS Act s27</span></div>
+      <ul id="brief"></ul>
+      <div class="decision" id="decision"></div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+  </section>
 
-  <div class="section">
-    <h3>Lead &amp; lag indicators — key WHS controls</h3>
-    <p class="section-sub">Lead = effort/resourcing put into a control. Lag = evidence the control is actually working. Framework per SafeWork NSW's inputs&nbsp;&rarr;&nbsp;outputs&nbsp;&rarr;&nbsp;outcomes model; figures below are live account data.</p>
-    
-        <div class="ll-row">
-          <div class="ll-control">Inspections & hazard checklists</div>
-          <div class="ll-lead"><span class="ll-tag">Lead</span>1 inspection(s) completed against 1 published template(s)</div>
-          <div class="ll-lag"><span class="ll-tag lag">Lag</span>100% completion rate</div>
-        </div>
-        <div class="ll-row">
-          <div class="ll-control">Corrective actions</div>
-          <div class="ll-lead"><span class="ll-tag">Lead</span>0 action(s) raised</div>
-          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0 of 0 open action(s) overdue</div>
-        </div>
-        <div class="ll-row">
-          <div class="ll-control">WHS training</div>
-          <div class="ll-lead"><span class="ll-tag">Lead</span>4 assignment(s) issued across 2 published course(s)</div>
-          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0% completion rate</div>
-        </div>
-        <div class="ll-row">
-          <div class="ll-control">Incident reporting & investigation</div>
-          <div class="ll-lead"><span class="ll-tag">Lead</span>0 incident(s) logged</div>
-          <div class="ll-lag"><span class="ll-tag lag">Lag</span>0 of 0 still open</div>
-        </div>
-  </div>
+  <section class="row r-82">
+    <div class="panel">
+      <div class="panel-h"><div><h2>Injury frequency, rolling 12 months</h2><p>Per 1,000,000 hours worked</p></div><span class="tag lag">Lag indicator</span></div>
+      <div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>TRIFR</span><span><i class="sw line" style="background:var(--s2)"></i>LTIFR</span><span><i class="sw dash"></i>TRIFR target 7.0</span></div>
+      <div class="chart" id="c-freq"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><h2>Hazards &amp; near misses reported</h2><p>Monthly reports, a measure of reporting culture</p></div><span class="tag lead">Lead indicator</span></div>
+      <div class="chart" id="c-reports"></div>
+    </div>
+  </section>
 
-  <div class="section">
-    <h3>WHS risk matrix — reference tool</h3>
-    <p class="section-sub">Rates risk by quality of existing controls &times; consequence class, rather than a subjective likelihood &times; consequence estimate — the approach SafeWork NSW's guide recommends. This is a decision aid for assessing hazards, not live account data.</p>
-    <table class="risk-matrix"><thead><tr><th>Quality of existing controls</th><th>Class 2<br/>(temporary impairment)</th><th>Class 1<br/>(high consequence)</th><th>Catastrophic<br/>(multiple fatality)</th></tr></thead><tbody><tr><td class="rm-row-label"><strong>1.</strong> Hazard eliminated — no identifiable residual risk</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td></tr><tr><td class="rm-row-label"><strong>2.</strong> Controls in place to the full extent reasonably practicable</td><td style="background:#eaf3de;color:#27500a;font-weight:600;">Very low</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td></tr><tr><td class="rm-row-label"><strong>3.</strong> Existing controls appear adequate, but stronger controls are available</td><td style="background:#dff0d8;color:#27500a;font-weight:600;">Low</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td></tr><tr><td class="rm-row-label"><strong>4.</strong> Existing controls are inadequate</td><td style="background:#faeeda;color:#633806;font-weight:600;">Moderate</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td></tr><tr><td class="rm-row-label"><strong>5.</strong> Risk is effectively uncontrolled</td><td style="background:#f8d7c0;color:#7a3c0a;font-weight:600;">High</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td><td style="background:#fcebeb;color:#791f1f;font-weight:600;">Critical</td></tr></tbody></table>
-  </div>
+  <section class="row r-11">
+    <div class="panel">
+      <div class="panel-h"><div><h2>Inspection score by site</h2><p>Average score, last 3 months · target 90%</p></div><span class="tag lead">Lead indicator</span></div>
+      <div class="chart" id="c-scores"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><h2>Overdue corrective actions</h2><p>Open past due date, by days overdue</p></div><span class="tag lead">Lead indicator</span></div>
+      <div class="legend"><span><i class="sw" style="background:var(--q1)"></i>1–30 days</span><span><i class="sw" style="background:var(--q2)"></i>31–60 days</span><span><i class="sw" style="background:var(--q3)"></i>Over 60 days</span></div>
+      <div class="chart" id="c-overdue"></div>
+    </div>
+  </section>
 
-  <div class="section">
-    <div class="dd-header">
-      <h3 style="margin-bottom:0;">Director / Officer Due Diligence — WHS Act s27</h3>
-      <span class="dd-summary">2/6 elements with evidence</span>
-    </div>
-    <p class="section-sub">Mapped to the six elements of the officer due-diligence duty under s27(5) of the (Australian) Work Health and Safety Act 2011, per Safe Work Australia / SafeWork NSW guidance.</p>
-    
-    <div class="dd-row">
-      <div class="dd-num">1</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Up-to-date WHS knowledge</span>
-          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
-        </div>
-        <div class="dd-detail">Officer/governance training records, briefings on WHS law and regulator priorities.</div>
-        <div class="dd-evidence">2 course(s) published, but no recorded completions yet.</div>
-        <div class="dd-records">Typical records: officer training records, board skills matrix, briefing packs</div>
-      </div>
-    </div>
-    <div class="dd-row">
-      <div class="dd-num">2</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Understand operations, hazards & risks</span>
-          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
-        </div>
-        <div class="dd-detail">Site coverage, hazard/risk checklists, critical-risk visibility.</div>
-        <div class="dd-evidence">1 template(s) published, but no sites/locations recorded to scope operations.</div>
-        <div class="dd-records">Typical records: risk registers, site visit logs, published templates</div>
-      </div>
-    </div>
-    <div class="dd-row">
-      <div class="dd-num">3</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Resources & processes to control risk</span>
-          <span class="dd-badge" style="background:#eaf3de;color:#27500a;">Evidence found</span>
-        </div>
-        <div class="dd-detail">Inspections actually run against hazard checklists; controls in use, not just on paper.</div>
-        <div class="dd-evidence">1 inspection(s) run using published templates.</div>
-        <div class="dd-records">Typical records: capital/resourcing requests, staffing plans, inspection frequency</div>
-      </div>
-    </div>
-    <div class="dd-row">
-      <div class="dd-num">4</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Timely response to hazards & incidents</span>
-          <span class="dd-badge" style="background:#fcebeb;color:#791f1f;">Gap</span>
-        </div>
-        <div class="dd-detail">Actions raised, assigned, and closed out within a reasonable time.</div>
-        <div class="dd-evidence">No corrective actions or incident reports recorded — no evidence of a hazard-response workflow in use.</div>
-        <div class="dd-records">Typical records: incident trend dashboards, action closure reports</div>
-      </div>
-    </div>
-    <div class="dd-row">
-      <div class="dd-num">5</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Processes to comply with WHS duties</span>
-          <span class="dd-badge" style="background:#eaf3de;color:#27500a;">Evidence found</span>
-        </div>
-        <div class="dd-detail">Notifiable incident reporting, consultation, WHS training/instruction, HSR training entitlements.</div>
-        <div class="dd-evidence">Both training courses and inspection processes are active.</div>
-        <div class="dd-records">Typical records: training matrices, consultation records, procedure suite</div>
-      </div>
-    </div>
-    <div class="dd-row">
-      <div class="dd-num">6</div>
-      <div class="dd-body">
-        <div class="dd-title-row">
-          <span class="dd-title">Verify resources & processes are used</span>
-          <span class="dd-badge" style="background:#faeeda;color:#633806;">Partial evidence</span>
-        </div>
-        <div class="dd-detail">Audits, inspections, reviews confirming controls are actually applied, not just documented.</div>
-        <div class="dd-evidence">Inspection completion 100%, training completion 0% — below a healthy threshold.</div>
-        <div class="dd-records">Typical records: audit plans/reports, corrective action logs, decision register</div>
-      </div>
-    </div>
-    <div class="disclaimer">
-      This panel surfaces evidence already present in your SafetyCulture account against the six statutory
-      elements of officer due diligence &mdash; it is a compliance-evidence aid, not a legal assessment.
-      "Evidence found" reflects data present, not a determination that due diligence has been satisfied;
-      "reasonable steps" is assessed by courts and regulators against your specific role, operations, and risk
-      profile. This is not legal advice. Seek independent legal advice on how these duties apply to your
-      circumstances. Source: SafeWork NSW, "Due diligence" and "The work health and safety duty of an officer"
-      guidance (safework.nsw.gov.au), interpreting s27 of the WHS Act 2011.
-    </div>
-  </div>
+  <section class="panel">
+    <div class="panel-h"><div><h2>Critical risk controls</h2><p>Verification of the controls that prevent fatal and life-changing injuries, last 90 days</p></div><span class="tag">Critical risk register</span></div>
+    <div class="tbl-wrap"><table id="t-ccv"></table></div>
+  </section>
 
-  <div class="footer">SafeWork NSW, "Measuring and Reporting WHS Information" (2020)</div>
+  <section class="row r-75">
+    <div class="panel">
+      <div class="panel-h"><div><h2>Psychosocial hazard heatmap</h2><p>Pulse survey risk rating, 1 (low) to 5 (high) · NSW Code of Practice, enforceable from 1 July 2026</p></div><span class="tag lead">Lead indicator</span></div>
+      <div class="tbl-wrap"><div class="heat" id="heat"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><h2>Oldest overdue actions</h2><p>Highest-priority items past due</p></div><span class="tag" id="act-count"></span></div>
+      <ul class="acts" id="acts"></ul>
+    </div>
+  </section>
+
+  <section class="row r-11">
+    <div class="panel">
+      <div class="panel-h"><div><h2>Training &amp; licence compliance</h2><p>Workers current on mandatory training and high-risk work licences</p></div><span class="tag lead">Lead indicator</span></div>
+      <div class="tbl-wrap"><table id="t-train"></table></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><h2>Contractor compliance</h2><p>Active contractors with current insurance, SWMS and inductions</p></div><span class="tag">Contractor management</span></div>
+      <div class="tbl-wrap"><table id="t-contr"></table></div>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Data sources.</b> Built to run on Mitti (SafetyCulture) inspections, actions, issues, training, credentials and contractor modules, refreshed monthly. This version uses fictional data for demonstration.</p>
+    <p><b>Definitions.</b> TRIFR counts LTIs, restricted-work and medical-treatment injuries per 1,000,000 hours worked; LTIFR counts lost-time injuries only. Both are rolling 12-month figures.</p>
+    <p><b>Prepared by</b> your independent WHS advisor for the Board and Audit &amp; Risk Committee. Not legal advice.</p>
+  </footer>
 </div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+/* ---------- Mock data (deterministic) ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function poisson(r,l){var L=Math.exp(-l),k=0,p=1;do{k++;p*=r()}while(p>L);return k-1}
+const SITES=[
+ {id:'som',name:'Somersby Plant',short:'Somersby',type:'Manufacturing',workers:212,rate:12.5,score:85.5,seed:11},
+ {id:'tug',name:'Tuggerah Distribution Centre',short:'Tuggerah',type:'Distribution',workers:168,rate:8.8,score:91.5,seed:23},
+ {id:'war',name:'Warnervale Logistics Hub',short:'Warnervale',type:'Logistics',workers:134,rate:7.2,score:93,seed:37},
+ {id:'ber',name:'Beresfield Cold Store',short:'Beresfield',type:'Cold storage',workers:96,rate:11.5,score:86,seed:41},
+ {id:'kur',name:'Kurri Kurri Fabrication',short:'Kurri Kurri',type:'Fabrication',workers:78,rate:15,score:80.5,seed:53}
+];
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS=[];for(let i=0;i<24;i++){const m=(9+i)%12,y=2024+Math.floor((9+i)/12);MONTHS.push({label:MN[m]+' '+String(y).slice(2),m,y})}
+SITES.forEach(s=>{
+  const r=rng(s.seed);s.months=MONTHS.map((mo,i)=>{
+    const t=i/23,hours=Math.round(s.workers*152*(0.95+r()*0.1));
+    const rec=poisson(r,s.rate*(1-0.18*t)*hours/1e6);
+    let lti=0;for(let k=0;k<rec;k++)if(r()<0.3)lti++;
+    const reports=poisson(r,s.workers*0.11*(0.8+0.6*t));
+    const sched=Math.round(18+s.workers/6),done=Math.min(sched,Math.round(sched*(0.8+0.15*t+r()*0.05)));
+    const score=Math.min(99,s.score+3.5*t+(r()-0.5)*3);
+    return {hours,rec,lti,reports,sched,done,score};
+  });
+});
+// Current snapshot data
+const OVERDUE={som:[9,5,4],tug:[6,2,1],war:[4,1,0],ber:[7,4,3],kur:[8,5,6]};
+const TRAIN={som:[94.1,91.0],tug:[96.8,97.5],war:[97.9,98.2],ber:[92.3,88.6],kur:[89.4,86.1]};
+const TRAIN_EXP={som:7,tug:3,war:2,ber:6,kur:9};
+const CONTR={som:[24,22],tug:[15,15],war:[11,11],ber:[13,11],kur:[19,15]};
+const CONTR_GAP={som:'2 expired public liability certificates',tug:'None',war:'None',ber:'Refrigeration contractor SWMS out of date',kur:'4 missing high-risk work SWMS'};
+const PSY_H=['Job demands & workload','Low job control','Fatigue & shift work','Poor support','Harmful behaviours','Remote or isolated work'];
+const PSY={som:[3.4,2.9,3.6,2.7,2.2,1.6],tug:[3.8,2.6,3.1,2.4,1.9,1.8],war:[3.1,2.3,2.8,2.1,1.7,2.4],ber:[3.6,3.0,4.3,3.1,2.6,3.2],kur:[3.2,3.4,3.0,3.5,3.1,2.0]};
+const CCV=[
+ {c:'Forklift and pedestrian separation',sites:'All sites',due:60,done:57,eff:93,owner:'Ops Managers',note:'Exclusion zones re-marked at Tuggerah'},
+ {c:'Isolation and lock-out of plant (LOTO)',sites:'Somersby, Kurri Kurri',due:36,done:31,eff:84,owner:'Maintenance Lead',note:'Two jobs found without personal locks'},
+ {c:'Working at heights and racking',sites:'Tuggerah, Warnervale, Beresfield',due:24,done:24,eff:96,owner:'Warehouse Managers',note:'Racking audit complete'},
+ {c:'Heavy vehicle fatigue (Chain of Responsibility)',sites:'Warnervale, Tuggerah',due:30,done:29,eff:90,owner:'Transport Manager',note:'Two drivers over work-hour limits, counselled'},
+ {c:'Cold store entrapment and ammonia release',sites:'Beresfield',due:12,done:8,eff:75,owner:'Site Manager',note:'Door release test overdue in chamber 3'},
+ {c:'Hot work and welding fume',sites:'Kurri Kurri',due:18,done:13,eff:72,owner:'Fabrication Supervisor',note:'Extraction fan failed its airflow check'}
+];
+const ACTIONS=[
+ {t:'Replace failed fume extraction fan, Bay 2',s:'kur',p:'crit',age:84,o:'Fabrication Supervisor'},
+ {t:'Test emergency door release, chamber 3',s:'ber',p:'crit',age:71,o:'Site Manager'},
+ {t:'Install guard on press brake rear access',s:'kur',p:'serious',age:66,o:'Maintenance Lead'},
+ {t:'Re-mark pedestrian walkway, dock 4 to 6',s:'som',p:'serious',age:63,o:'Ops Manager'},
+ {t:'Update fatigue roster for night pick crew',s:'ber',p:'serious',age:58,o:'HR Business Partner'},
+ {t:'Recertify 3 forklift licences',s:'som',p:'warn',age:47,o:'Training Coordinator'},
+ {t:'Fix racking upright damage, aisle 14',s:'tug',p:'serious',age:39,o:'Warehouse Manager'},
+ {t:'Psychosocial risk assessment, shift supervisors',s:'kur',p:'warn',age:33,o:'HR Business Partner'},
+ {t:'Repair spill kit station, battery charging bay',s:'war',p:'warn',age:21,o:'Site Coordinator'}
+];
+const PLABEL={crit:'Critical',serious:'High',warn:'Medium',good:'Low'};
+
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const fmt=(v,d=1)=>v.toLocaleString('en-AU',{minimumFractionDigits:d,maximumFractionDigits:d});
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const ICON={
+ good:'<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="var(--good)"/><path d="M3.4 6.2l1.7 1.6 3.4-3.6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+ warn:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l5.4 10H.6z" fill="var(--warn)"/><path d="M6 4.3v3M6 8.8v.1" stroke="#121513" stroke-width="1.4" stroke-linecap="round"/></svg>',
+ serious:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l5.4 10H.6z" fill="var(--serious)"/><path d="M6 4.3v3M6 8.8v.1" stroke="#121513" stroke-width="1.4" stroke-linecap="round"/></svg>',
+ crit:'<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="var(--crit)"/><path d="M6 3.2v3.4M6 8.5v.1" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>'
+};
+const pill=(k,txt)=>`<span class="pill ${k}">${ICON[k]}${txt}</span>`;
+const tip=$('#tip');
+function showTip(e,html){tip.innerHTML=html;tip.hidden=false;const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px'}
+function hideTip(){tip.hidden=true}
+function bindTips(root){root.querySelectorAll('[data-tip]').forEach(el=>{el.addEventListener('mousemove',e=>showTip(e,el.getAttribute('data-tip')));el.addEventListener('mouseleave',hideTip)})}
+function niceMax(v){const p=Math.pow(10,Math.floor(Math.log10(v))),n=v/p;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p}
+
+/* ---------- Aggregation ---------- */
+let SEL='all';
+function selSites(){return SEL==='all'?SITES:SITES.filter(s=>s.id===SEL)}
+function monthly(){const ss=selSites();return MONTHS.map((_,i)=>{const o={hours:0,rec:0,lti:0,reports:0,sched:0,done:0,scoreW:0,w:0};ss.forEach(s=>{const d=s.months[i];o.hours+=d.hours;o.rec+=d.rec;o.lti+=d.lti;o.reports+=d.reports;o.sched+=d.sched;o.done+=d.done;o.scoreW+=d.score*s.workers;o.w+=s.workers});o.score=o.scoreW/o.w;return o})}
+function rolling(arr,i,key){let a=0,h=0;for(let k=i-11;k<=i;k++){a+=arr[k][key];h+=arr[k].hours}return a*1e6/h}
+function siteScore3(s){return (s.months[21].score+s.months[22].score+s.months[23].score)/3}
+
+/* ---------- Brief + tiles ---------- */
+function renderSummary(){
+  const M=monthly(),ss=selSites(),workers=ss.reduce((a,s)=>a+s.workers,0);
+  const tr=[],lt=[];for(let i=12;i<24;i++){tr.push(rolling(M,i,'rec'));lt.push(rolling(M,i,'lti'))}
+  const trNow=tr[11],trPrev=rolling(M,11,'rec'),ltNow=lt[11],ltPrev=rolling(M,11,'lti');
+  const insp3=(M[21].done+M[22].done+M[23].done)/(M[21].sched+M[22].sched+M[23].sched)*100;
+  const insp3p=(M[18].done+M[19].done+M[20].done)/(M[18].sched+M[19].sched+M[20].sched)*100;
+  const rep12=M.slice(12).reduce((a,d)=>a+d.reports,0)/workers*100,rep12p=M.slice(0,12).reduce((a,d)=>a+d.reports,0)/workers*100;
+  const od=ss.reduce((a,s)=>{const o=OVERDUE[s.id];return [a[0]+o[0],a[1]+o[1],a[2]+o[2]]},[0,0,0]),odT=od[0]+od[1]+od[2];
+  const trn=ss.reduce((a,s)=>a+TRAIN[s.id][0]*s.workers,0)/workers;
+  const pct=(n,p)=>(n-p)/p*100;
+  const spark=(vals,color,target)=>{const w=120,h=28,mn=Math.min(...vals,target??Infinity)*0.92,mx=Math.max(...vals,target??-Infinity)*1.04,x=i=>i/(vals.length-1)*w,y=v=>h-2-(v-mn)/(mx-mn)*(h-4);let d=vals.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join('');let t=target!=null?`<line x1="0" x2="${w}" y1="${y(target)}" y2="${y(target)}" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1"/>`:'';return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${t}<path d="${d}" fill="none" stroke="${color}" stroke-width="1.75" vector-effect="non-scaling-stroke"/><circle cx="${x(vals.length-1)}" cy="${y(vals[vals.length-1])}" r="2.5" fill="${color}"/></svg>`};
+  const status=(k)=>pill(k,{good:'On track',warn:'Watch',serious:'Off track',crit:'Act now'}[k]);
+  const tiles=[
+    {l:'TRIFR',v:fmt(trNow),u:'per 1M hrs',d:pct(trNow,trPrev),better:'down',st:trNow<=7?'good':trNow<=9?'warn':'serious',sp:spark(tr,'var(--s1)',7),note:'target 7.0'},
+    {l:'LTIFR',v:fmt(ltNow),u:'per 1M hrs',d:pct(ltNow,ltPrev),better:'down',st:ltNow<=2.5?'good':ltNow<=3.5?'warn':'serious',sp:spark(lt,'var(--s2)',2.5),note:'target 2.5'},
+    {l:'Inspections completed',v:fmt(insp3,0),u:'%',d:insp3-insp3p,abs:true,better:'up',st:insp3>=95?'good':insp3>=90?'warn':'serious',sp:spark(M.slice(12).map(d=>d.done/d.sched*100),'var(--s1)',95),note:'last 3 months · target 95%'},
+    {l:'Hazard & near-miss reports',v:fmt(rep12,0),u:'per 100 workers',d:pct(rep12,rep12p),better:'up',st:rep12>=150?'good':'warn',sp:spark(M.slice(12).map(d=>d.reports),'var(--s1)'),note:'12 months'},
+    {l:'Overdue actions',v:odT,u:od[2]+' over 60 days',noDelta:true,st:od[2]>=6?'crit':od[2]>=3?'serious':od[2]>0?'warn':'good',note:'open past due date'},
+    {l:'Training compliance',v:fmt(trn,1),u:'%',noDelta:true,st:trn>=95?'good':trn>=92?'warn':'serious',note:'target 95%'}
+  ];
+  $('#tiles').innerHTML=tiles.map(t=>{
+    let dl='';if(!t.noDelta){const good=t.better==='down'?t.d<0:t.d>0;dl=`<span class="delta ${good?'good':'bad'}">${t.d>0?'▲':'▼'} ${fmt(Math.abs(t.d),1)}${t.abs?' pts':'%'}</span><span>vs prior year</span>`}
+    return `<div class="tile"><div class="label"><span>${t.l}</span>${status(t.st)}</div><div class="value num">${t.v}<small>${t.u}</small></div>${t.sp||''}<div class="foot">${dl}<span>${t.note}</span></div></div>`}).join('');
+
+  // Brief: generated from the same numbers
+  const scope=SEL==='all'?'Across all five sites':'At '+ss[0].name;
+  const worstSite=SITES.slice().sort((a,b)=>siteScore3(a)-siteScore3(b))[0];
+  const ccvBad=CCV.filter(c=>c.eff<80);
+  let psyMax={v:0};SITES.forEach(s=>PSY[s.id].forEach((v,i)=>{if((SEL==='all'||s.id===SEL)&&v>psyMax.v)psyMax={v,s,h:PSY_H[i]}}));
+  const items=[
+   {k:trNow<=7?'good':'serious',h:`${scope}, TRIFR is ${fmt(trNow)}, ${trNow<trPrev?'down':'up'} ${fmt(Math.abs(pct(trNow,trPrev)),0)}% on last year${trNow>7?' but still above the 7.0 target':' and inside target'}.`},
+   {k:ccvBad.length?'crit':'good',h:ccvBad.length?`<b>${ccvBad.length} critical controls are below 80% effective:</b> ${ccvBad.map(c=>c.c.toLowerCase()).join(' and ')}. These carry fatality potential.`:'All critical controls verified at 80% or better.'},
+   {k:od[2]>=3?'serious':'warn',h:`<b>${odT} corrective actions are overdue</b>, ${od[2]} by more than 60 days.${SEL==='all'?' '+worstSite.short+' has the lowest inspection score ('+fmt(siteScore3(worstSite),0)+'%) and the oldest backlog.':''}`},
+   {k:psyMax.v>=4?'serious':'warn',h:`Highest psychosocial risk: <b>${psyMax.h.toLowerCase()} at ${psyMax.s.short}</b> (${fmt(psyMax.v)}/5). The NSW Code now requires controls to be in place and reviewed.`},
+   {k:'good',h:`Reporting culture is strengthening: hazard and near-miss reports are up ${fmt(pct(rep12,rep12p),0)}% year on year.`}
+  ];
+  $('#brief').innerHTML=items.map(i=>`<li>${ICON[i.k].replace('<svg','<svg width="16" height="16" style="margin-top:2px"')}<p>${i.h}</p></li>`).join('');
+  $('#decision').innerHTML='<b>Decision sought</b>Approve $85k for fume extraction and cold store door upgrades, and endorse a fatigue risk review for night shifts at Beresfield, both to report back in December.';
+}
+
+/* ---------- Line chart: rolling TRIFR / LTIFR ---------- */
+function renderFreq(){
+  const el=$('#c-freq'),W=el.clientWidth||600,H=250,m={t:12,r:44,b:28,l:34};
+  const M=monthly(),idx=[...Array(12)].map((_,k)=>12+k);
+  const s1=idx.map(i=>rolling(M,i,'rec')),s2=idx.map(i=>rolling(M,i,'lti'));
+  const ymax=niceMax(Math.max(...s1,7)*1.1),iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const x=k=>m.l+k/11*iw,y=v=>m.t+ih-v/ymax*ih;
+  const ticks=[0,.25,.5,.75,1].map(f=>f*ymax);
+  let g=ticks.map(v=>`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${fmt(v,v%1?1:0)}</text>`).join('');
+  const step=W<480?3:2;
+  g+=idx.map((i,k)=>k%step===(11%step)?`<text x="${x(k)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${MONTHS[i].label}</text>`:'').join('');
+  g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)"/>`;
+  g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(7)}" y2="${y(7)}" stroke="var(--muted)" stroke-dasharray="4 4"/>`;
+  const path=(s)=>s.map((v,k)=>(k?'L':'M')+x(k).toFixed(1)+' '+y(v).toFixed(1)).join('');
+  const area=path(s1)+`L${x(11)} ${y(0)}L${x(0)} ${y(0)}Z`;
+  g+=`<path d="${area}" fill="var(--s1)" opacity=".08"/>`;
+  g+=`<path d="${path(s1)}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/><path d="${path(s2)}" fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round"/>`;
+  g+=`<circle cx="${x(11)}" cy="${y(s1[11])}" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><circle cx="${x(11)}" cy="${y(s2[11])}" r="4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>`;
+  g+=`<text x="${x(11)+8}" y="${y(s1[11])+4}" font-size="12" font-weight="600" fill="var(--ink)" class="num">${fmt(s1[11])}</text><text x="${x(11)+8}" y="${y(s2[11])+4}" font-size="12" font-weight="600" fill="var(--ink)" class="num">${fmt(s2[11])}</text>`;
+  g+=`<g id="xh" style="display:none"><line y1="${m.t}" y2="${m.t+ih}" stroke="var(--axis)"/><circle r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><circle r="4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/></g>`;
+  g+=`<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" id="hit"/>`;
+  el.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Rolling 12-month TRIFR and LTIFR, October 2025 to September 2026">${g}</svg>`;
+  const svg=el.querySelector('svg'),xh=svg.querySelector('#xh'),hit=svg.querySelector('#hit');
+  hit.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect(),k=Math.max(0,Math.min(11,Math.round((e.clientX-r.left-m.l)/iw*11)));xh.style.display='';const [ln,c1,c2]=xh.children;ln.setAttribute('x1',x(k));ln.setAttribute('x2',x(k));c1.setAttribute('cx',x(k));c1.setAttribute('cy',y(s1[k]));c2.setAttribute('cx',x(k));c2.setAttribute('cy',y(s2[k]));const mo=M[idx[k]];showTip(e,`<b>${MONTHS[idx[k]].label}</b><div class="tr"><span>TRIFR</span><span>${fmt(s1[k])}</span></div><div class="tr"><span>LTIFR</span><span>${fmt(s2[k])}</span></div><div class="tr"><span>Recordables this month</span><span>${mo.rec}</span></div>`)});
+  hit.addEventListener('mouseleave',()=>{xh.style.display='none';hideTip()});
+}
+
+/* ---------- Bars: monthly reports ---------- */
+function renderReports(){
+  const el=$('#c-reports'),W=el.clientWidth||360,H=250,m={t:12,r:8,b:28,l:34};
+  const M=monthly().slice(12),vals=M.map(d=>d.reports),ymax=niceMax(Math.max(...vals)*1.1),iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const bw=iw/12,y=v=>m.t+ih-v/ymax*ih;
+  let g=[0,.5,1].map(f=>f*ymax).map(v=>`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${Math.round(v)}</text>`).join('');
+  vals.forEach((v,k)=>{const x0=m.l+k*bw+1,w=Math.max(2,bw-2),h=y(0)-y(v),r=Math.min(4,w/2,h);const top=y(v);
+    g+=`<path d="M${x0} ${y(0)}V${top+r}Q${x0} ${top} ${x0+r} ${top}H${x0+w-r}Q${x0+w} ${top} ${x0+w} ${top+r}V${y(0)}Z" fill="var(--s1)" opacity="${k===11?1:.55}"/>`;
+    g+=`<rect x="${m.l+k*bw}" y="${m.t}" width="${bw}" height="${ih}" fill="transparent" data-tip="<b>${MONTHS[12+k].label}</b><div class='tr'><span>Reports</span><span>${v}</span></div>"/>`;
+    if(k%3===2)g+=`<text x="${x0+w/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${MONTHS[12+k].label.slice(0,3)}</text>`});
+  g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)"/>`;
+  g+=`<text x="${m.l+11*bw+bw/2}" y="${y(vals[11])-6}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">${vals[11]}</text>`;
+  el.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Monthly hazard and near-miss reports">${g}</svg>`;bindTips(el);
+}
+
+/* ---------- Horizontal bars: inspection score by site ---------- */
+function renderScores(){
+  const el=$('#c-scores'),W=el.clientWidth||500,rowH=40,lab=W<480?96:170,m={t:8,r:56,b:24,l:lab},H=m.t+m.b+rowH*SITES.length,iw=W-m.l-m.r;
+  const lo=70,hi=100,x=v=>m.l+(v-lo)/(hi-lo)*iw;
+  let g=[70,80,90,100].map(v=>`<line x1="${x(v)}" x2="${x(v)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><text x="${x(v)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${v}%</text>`).join('');
+  g+=`<line x1="${x(90)}" x2="${x(90)}" y1="${m.t-4}" y2="${H-m.b}" stroke="var(--ink-2)" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  SITES.slice().sort((a,b)=>siteScore3(b)-siteScore3(a)).forEach((s,i)=>{
+    const v=siteScore3(s),yy=m.t+i*rowH+10,h=rowH-20,dim=SEL!=='all'&&SEL!==s.id;const st=v>=90?'good':v>=85?'warn':'serious';
+    g+=`<g class="${dim?'dim':''}"><text x="${m.l-10}" y="${yy+h/2+4}" text-anchor="end" font-size="12.5" fill="var(--ink)">${W<480?s.short:s.name}</text>`;
+    g+=`<path d="M${x(lo)} ${yy}H${x(v)-4}Q${x(v)} ${yy} ${x(v)} ${yy+4}V${yy+h-4}Q${x(v)} ${yy+h} ${x(v)-4} ${yy+h}H${x(lo)}Z" fill="var(--s1)"/>`;
+    g+=`<text x="${x(v)+8}" y="${yy+h/2+4}" font-size="12.5" font-weight="600" fill="var(--ink)">${fmt(v,0)}%</text>`;
+    g+=`<circle cx="${W-10}" cy="${yy+h/2}" r="5" fill="var(--${st==='warn'?'warn':st==='good'?'good':'serious'})"/>`;
+    g+=`<rect x="0" y="${m.t+i*rowH}" width="${W}" height="${rowH}" fill="transparent" data-tip="<b>${s.name}</b><div class='tr'><span>Avg score, 3 months</span><span>${fmt(v,1)}%</span></div><div class='tr'><span>Status</span><span>${{good:'At or above target',warn:'Below target',serious:'Well below target'}[st]}</span></div>"/></g>`;
+  });
+  el.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Average inspection score by site">${g}</svg>`;bindTips(el);
+}
+
+/* ---------- Stacked bars: overdue actions ---------- */
+function renderOverdue(){
+  const el=$('#c-overdue'),W=el.clientWidth||500,rowH=40,lab=W<480?96:170,m={t:8,r:40,b:24,l:lab},H=m.t+m.b+rowH*SITES.length,iw=W-m.l-m.r;
+  const tot=s=>OVERDUE[s.id].reduce((a,b)=>a+b,0),xmax=niceMax(Math.max(...SITES.map(tot))),x=v=>m.l+v/xmax*iw;
+  const cols=['var(--q1)','var(--q2)','var(--q3)'],names=['1–30 days','31–60 days','Over 60 days'];
+  let g=[0,.5,1].map(f=>f*xmax).map(v=>`<line x1="${x(v)}" x2="${x(v)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><text x="${x(v)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${v}</text>`).join('');
+  SITES.slice().sort((a,b)=>OVERDUE[b.id][2]-OVERDUE[a.id][2]||tot(b)-tot(a)).forEach((s,i)=>{
+    const o=OVERDUE[s.id],yy=m.t+i*rowH+10,h=rowH-20,dim=SEL!=='all'&&SEL!==s.id;let acc=0;
+    g+=`<g class="${dim?'dim':''}"><text x="${m.l-10}" y="${yy+h/2+4}" text-anchor="end" font-size="12.5" fill="var(--ink)">${W<480?s.short:s.name}</text>`;
+    const segs=o.map((v,k)=>({v,k})).filter(d=>d.v>0);
+    segs.forEach((d,j)=>{const x0=x(acc)+(j?1:0),x1=x(acc+d.v)-(j<segs.length-1?1:0);acc+=d.v;const last=j===segs.length-1,r=last?Math.min(4,(x1-x0)/2):0;
+      g+=`<path d="M${x0} ${yy}H${x1-r}Q${x1} ${yy} ${x1} ${yy+r}V${yy+h-r}Q${x1} ${yy+h} ${x1-r} ${yy+h}H${x0}Z" fill="${cols[d.k]}"/>`});
+    g+=`<text x="${x(tot(s))+8}" y="${yy+h/2+4}" font-size="12.5" font-weight="600" fill="var(--ink)">${tot(s)}</text>`;
+    g+=`<rect x="0" y="${m.t+i*rowH}" width="${W}" height="${rowH}" fill="transparent" data-tip="<b>${s.name}</b>${o.map((v,k)=>`<div class='tr'><span>${names[k]}</span><span>${v}</span></div>`).join('')}"/></g>`;
+  });
+  g+=`<line x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--axis)"/>`;
+  el.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Overdue corrective actions by site and age">${g}</svg>`;bindTips(el);
+}
+
+/* ---------- Critical controls table ---------- */
+function renderCCV(){
+  const rows=CCV.map(c=>{const comp=c.done/c.due*100,st=c.eff>=90&&comp>=95?'good':c.eff>=85?'warn':c.eff>=80?'serious':'crit';
+    const rel=SEL==='all'||c.sites==='All sites'||c.sites.includes(SITES.find(s=>s.id===SEL).short);
+    return `<tr class="${rel?'':'dim'}"><td><div style="font-weight:500">${c.c}</div><div class="sub">${c.sites}</div></td><td class="r num">${c.done} / ${c.due}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar-mini" style="flex:1"><span style="width:${comp}%"></span></div><span class="num" style="width:34px;text-align:right">${fmt(comp,0)}%</span></div></td><td class="r num" style="font-weight:600">${c.eff}%</td><td>${pill(st,{good:'Effective',warn:'Watch',serious:'Weak',crit:'Failing'}[st])}</td><td class="sub">${c.note}</td><td class="sub">${c.owner}</td></tr>`}).join('');
+  $('#t-ccv').innerHTML=`<thead><tr><th>Critical control</th><th class="r">Checks done</th><th>Completion</th><th class="r">Effective</th><th>Status</th><th>Key finding</th><th>Owner</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+/* ---------- Heatmap ---------- */
+function renderHeat(){
+  const el=$('#heat'),shade=v=>v<2?'--h1':v<2.75?'--h2':v<3.5?'--h3':v<4?'--h4':'--h5',ink=v=>v<2.75?'var(--ink)':'#ffffff';
+  const inkDark=v=>{const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);return dark?(v<3.5?'#ffffff':'#121513'):ink(v)};
+  el.style.gridTemplateColumns=`minmax(110px,1.3fr) repeat(${PSY_H.length},minmax(56px,1fr))`;
+  let h=`<div></div>`+PSY_H.map(x=>`<div class="hh">${x}</div>`).join('');
+  SITES.forEach(s=>{const dim=SEL!=='all'&&SEL!==s.id;h+=`<div class="hl ${dim?'dim':''}">${s.short}</div>`+PSY[s.id].map((v,i)=>`<div class="hc ${dim?'dim':''}" style="background:var(${shade(v)});color:${inkDark(v)}" data-tip="<b>${s.name}</b><div>${PSY_H[i]}</div><div class='tr'><span>Risk rating</span><span>${fmt(v)} / 5</span></div><div>${v>=4?'High: controls required now':v>=3.5?'Elevated: review controls':v>=2.75?'Moderate: monitor':'Low'}</div>">${fmt(v)}</div>`).join('')});
+  el.innerHTML=h+`<div></div><div style="grid-column:2/-1;display:flex;gap:10px;align-items:center;margin-top:6px;color:var(--muted);font-size:11px;flex-wrap:wrap"><span>Low</span>${['--h1','--h2','--h3','--h4','--h5'].map(c=>`<i class="sw" style="background:var(${c});width:22px"></i>`).join('')}<span>High</span><span style="margin-left:8px">n = 784 responses, August 2026</span></div>`;
+  bindTips(el);
+}
+
+/* ---------- Actions list ---------- */
+function renderActs(){
+  const list=ACTIONS.filter(a=>SEL==='all'||a.s===SEL).sort((a,b)=>b.age-a.age).slice(0,6);
+  $('#act-count').textContent=list.length+' shown';
+  $('#acts').innerHTML=list.length?list.map(a=>`<li><span class="stripe" style="background:var(--${a.p==='crit'?'crit':a.p==='serious'?'serious':'warn'})"></span><div style="min-width:0"><div class="t">${a.t}</div><div class="m">${SITES.find(s=>s.id===a.s).short} · ${a.o} · ${PLABEL[a.p]} priority</div></div><div class="age"><b>${a.age}</b> days<br><span class="sub">overdue</span></div></li>`).join(''):'<li><span></span><div>No overdue high-priority actions at this site.</div><span></span></li>';
+}
+
+/* ---------- Training & contractor tables ---------- */
+function renderPeople(){
+  const st=v=>v>=95?'good':v>=92?'warn':'serious';
+  $('#t-train').innerHTML=`<thead><tr><th>Site</th><th class="r">Workers</th><th class="r">Training</th><th class="r">Licences</th><th class="r">Expiring</th></tr></thead><tbody>`+SITES.map(s=>{const t=TRAIN[s.id];return `<tr class="${SEL!=='all'&&SEL!==s.id?'dim':''}"><td>${s.name}<div class="sub">${s.type}</div></td><td class="r num">${s.workers}</td><td class="r">${pill(st(t[0]),fmt(t[0])+'%')}</td><td class="r">${pill(st(t[1]),fmt(t[1])+'%')}</td><td class="r num">${TRAIN_EXP[s.id]}</td></tr>`}).join('')+'</tbody>';
+  $('#t-contr').innerHTML=`<thead><tr><th>Site</th><th class="r">Compliant</th><th>Gap</th></tr></thead><tbody>`+SITES.map(s=>{const c=CONTR[s.id],p=c[1]/c[0]*100;return `<tr class="${SEL!=='all'&&SEL!==s.id?'dim':''}"><td>${s.short}</td><td class="r">${pill(p===100?'good':p>=85?'warn':'serious',c[1]+' of '+c[0])}</td><td class="sub">${CONTR_GAP[s.id]}</td></tr>`}).join('')+'</tbody>';
+}
+
+function renderAll(){renderSummary();renderFreq();renderReports();renderScores();renderOverdue();renderCCV();renderHeat();renderActs();renderPeople()}
+
+const sel=$('#site');sel.innerHTML=`<option value="all">All sites (${SITES.reduce((a,s)=>a+s.workers,0)} workers)</option>`+SITES.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+try{const saved=localStorage.getItem('whs-site');if(saved&&[...sel.options].some(o=>o.value===saved)){sel.value=saved;SEL=saved}}catch(e){}
+sel.addEventListener('change',()=>{SEL=sel.value;try{localStorage.setItem('whs-site',SEL)}catch(e){}renderAll()});
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{renderFreq();renderReports();renderScores();renderOverdue()},120)});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',renderHeat);
+new MutationObserver(renderHeat).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+renderAll();
+})();
+</script>
+
 </body>
 </html>
